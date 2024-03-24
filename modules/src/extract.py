@@ -1,18 +1,21 @@
-import re
+from pathlib import Path
 
 
-def get_date(subject: str, pattern: str = r"\d{4}/\d{2}-\d{2}") -> str:
-    """Returns the matched date string from the subject string.
+def get_folder(subject: str):
+    """Get the folder from the provided subject path.
 
     Args:
-        subject (str): The string to search for the date.
-        pattern (str, optional): The regular expression pattern to find the date. Defaults to r"[0-9]{4}/[0-9]{2}-[0-9]{2}".
+        subject (str): The subject path.
+                       (e.g. "object/2023/12-30/sample.avro")
 
     Returns:
-        str: The matched date string.
+        str: The folder path.
+             (e.g. "2024/04-01")
     """
-    try:
-        target = re.search(pattern, subject)
-        return target.group()
-    except AttributeError:
-        raise ValueError(f"No {pattern} found in {subject} string.")
+    p = Path(subject)
+
+    if p.parts[0] != "objects":
+        raise ValueError(f"The top level directory of the subject is {p.parts[0]} instead of 'object'.")
+
+    folder = Path(*p.parts[1:-1]).as_posix()
+    return folder

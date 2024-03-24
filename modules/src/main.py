@@ -6,7 +6,7 @@ import functions_framework
 from cloudevents.http.event import CloudEvent
 
 from authz import get_token
-from extract import get_date
+from extract import get_folder
 from logger import get_logger
 
 
@@ -17,8 +17,11 @@ def create_dataflow(cloud_event: CloudEvent):
     except KeyError:
         raise KeyError(f"Cannot found key 'subject' in Cloud Event attributes.")
 
-    target = get_date(subject.as_posix())
     logger = get_logger()
+
+    logger.info(f"Subject: {subject}")
+
+    target = get_folder(subject.as_posix())
 
     if subject.name != "spanner-export.json":
         logger.info("Skip Sync due to different file.")
@@ -34,7 +37,7 @@ def create_dataflow(cloud_event: CloudEvent):
         "parameters": {
             "instanceId": os.environ["INSTANCE_ID"],
             "databaseId": os.environ["DATABACE_ID"],
-            "inputDir": f"{os.environ['INPUT_DIR']}/{target}",
+            "inputDir": (Path(os.environ['INPUT_DIR']) / Path(target)).as_posix(),
         },
         "environment": {
             "serviceAccountEmail": os.environ["SERVICE_ACCOUNT_EMAIL"],
