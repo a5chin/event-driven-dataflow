@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from google.cloud import storage
+
 
 def get_folder(subject: str):
     """Get the folder from the provided subject path.
@@ -12,10 +14,18 @@ def get_folder(subject: str):
         str: The folder path.
              (e.g. "2024/04-01")
     """
-    p = Path(subject)
+    parts = Path(subject).parts
 
-    if p.parts[0] != "objects":
-        raise ValueError(f"The top level directory of the subject is {p.parts[0]} instead of 'object'.")
+    if parts[0] != "objects":
+        raise ValueError(
+            f"The top level directory of the subject is {parts[0]} instead of 'object'."
+        )
 
-    folder = Path(*p.parts[1:-1]).as_posix()
-    return folder
+    return Path(*parts[1:-1]).as_posix()
+
+
+def is_file_exists(bucket: str, folder: str, extension: str = ".avro") -> bool:
+    storage_client = storage.Client()
+    blobs = storage_client.list_blobs(bucket, prefix=folder)
+
+    return not any(blob.name.endswith(extension) for blob in blobs)

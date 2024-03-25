@@ -6,7 +6,7 @@ import functions_framework
 from cloudevents.http.event import CloudEvent
 
 from authz import get_token
-from extract import get_folder
+from extract import get_folder, is_file_exists
 from logger import get_logger
 
 
@@ -21,11 +21,14 @@ def create_dataflow(cloud_event: CloudEvent):
 
     logger.info(f"Subject: {subject}")
 
-    target = get_folder(subject.as_posix())
+    folder = get_folder(subject.as_posix())
 
     if subject.name != "spanner-export.json":
         logger.info("Skip Sync due to different file.")
         return
+
+    if is_file_exists(os.environ["INPUT_DIR"], folder, extension := ".avro"):
+        raise FileNotFoundError(f"{extension} file is not found.")
 
     access_token = get_token()
 
@@ -37,7 +40,7 @@ def create_dataflow(cloud_event: CloudEvent):
         "parameters": {
             "instanceId": os.environ["INSTANCE_ID"],
             "databaseId": os.environ["DATABACE_ID"],
-            "inputDir": (Path(os.environ['INPUT_DIR']) / Path(target)).as_posix(),
+            "inputDir": (Path(os.environ["INPUT_DIR"]) / Path(folder)).as_posix(),
         },
         "environment": {
             "serviceAccountEmail": os.environ["SERVICE_ACCOUNT_EMAIL"],
