@@ -40,7 +40,7 @@ def create_dataflow(cloud_event: CloudEvent):
         "parameters": {
             "instanceId": os.environ["INSTANCE_ID"],
             "databaseId": os.environ["DATABACE_ID"],
-            "inputDir": (Path(os.environ["INPUT_DIR"]) / Path(folder)).as_posix(),
+            "inputDir": f"{os.environ['INPUT_DIR']}/{folder}",
         },
         "environment": {
             "serviceAccountEmail": os.environ["SERVICE_ACCOUNT_EMAIL"],
