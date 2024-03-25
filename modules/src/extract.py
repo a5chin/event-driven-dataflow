@@ -18,7 +18,7 @@ def get_folder(subject: str):
 
     if parts[0] != "objects":
         raise ValueError(
-            f"The top level directory of the subject is {parts[0]} instead of 'object'."
+            f"The top level directory of the subject is {parts[0]} instead of 'objects'."
         )
 
     return Path(*parts[1:-1]).as_posix()
