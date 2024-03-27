@@ -18,20 +18,17 @@ def create_dataflow(cloud_event: CloudEvent):
         raise KeyError(f"Cannot found key 'subject' in Cloud Event attributes.")
 
     logger = get_logger()
-
     logger.info(f"Subject: {subject}")
-
-    folder = get_folder(subject.as_posix())
 
     if subject.name != "spanner-export.json":
         logger.info("Skip Sync due to different file.")
         return
 
+    folder = get_folder(subject.as_posix())
     if not is_file_exists(os.environ["INPUT_DIR"], folder, extension := ".avro"):
         raise FileNotFoundError(f"{extension} file is not found.")
 
     access_token = get_token()
-
     api = f"https://dataflow.googleapis.com/v1b3/projects/{os.environ['PROJECT_ID']}/locations/us-central1/templates"
     headers = {"Authorization": f"Bearer {access_token}"}
     body = {
