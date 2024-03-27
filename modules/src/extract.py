@@ -28,4 +28,4 @@ def is_file_exists(bucket: str, folder: str, extension: str = ".avro") -> bool:
     storage_client = storage.Client()
     blobs = storage_client.list_blobs(bucket, prefix=folder)
 
-    return not any(blob.name.endswith(extension) for blob in blobs)
+    return any(blob.name.endswith(extension) for blob in blobs)

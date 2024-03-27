@@ -27,7 +27,7 @@ def create_dataflow(cloud_event: CloudEvent):
         logger.info("Skip Sync due to different file.")
         return
 
-    if is_file_exists(os.environ["INPUT_DIR"], folder, extension := ".avro"):
+    if not is_file_exists(os.environ["INPUT_DIR"], folder, extension := ".avro"):
         raise FileNotFoundError(f"{extension} file is not found.")
 
     access_token = get_token()
